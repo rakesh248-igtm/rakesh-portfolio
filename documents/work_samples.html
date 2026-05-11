@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Sample Work / Skills Demonstration</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #151820;
+      --card:     #1c2030;
+      --border:   #2a2f42;
+      --accent:   #4f8ef7;
+      --accent2:  #7c5cfc;
+      --accent3:  #38c9a8;
+      --text:     #e8eaf2;
+      --muted:    #7a7f96;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── LAYOUT SHELL ── */
+    .shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text);
+      flex: 1;
+      text-align: center;
+    }
+
+    #detButton {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(79,142,247,.12);
+      border: 1px solid rgba(79,142,247,.25);
+      flex-shrink: 0;
+      transition: background .2s, border-color .2s, transform .15s;
+    }
+    #detButton:hover { background: rgba(79,142,247,.22); border-color: var(--accent); transform: translateY(-1px); }
+    #detButton svg { width: 18px; height: 18px; }
+
+    /* ── BODY SPLIT ── */
+    .content-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR WRAPPER ── */
+    .sidebar-wrapper {
+      width: 240px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR LABEL — fixed, never scrolls ── */
+    .sidebar-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 15.5px 20px 15.5px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    /* ── BUTTON SECTION — scrolls below label ── */
+    .button-section {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      gap: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    /* station buttons */
+    .fancy-button {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      transition: background .18s, border-color .18s, transform .15s;
+      position: relative;
+    }
+
+    .fancy-button::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      border-radius: 3px 0 0 3px;
+      opacity: 0;
+      transition: opacity .18s;
+    }
+
+    .fancy-button:hover,
+    .fancy-button.active {
+      background: rgba(79,142,247,.08);
+      border-color: rgba(79,142,247,.35);
+      transform: translateX(2px);
+    }
+
+    .fancy-button:hover::before,
+    .fancy-button.active::before { opacity: 1; }
+
+    .station-code {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .description {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.35;
+      transition: color .18s;
+    }
+
+    .fancy-button:hover .description,
+    .fancy-button.active .description { color: var(--text); }
+
+    /* ── CONTENT AREA ── */
+    .content-section {
+      flex: 1;
+      position: relative;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .content-topbar {
+      height: 44px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .content-topbar-label { font-size: 0.78rem; font-weight: 500; color: var(--muted); }
+    .content-topbar-title { font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--text); }
+
+    /* loader */
+    .loader-container {
+      position: absolute;
+      inset: 44px 0 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      z-index: 10;
+    }
+
+    .loader {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .content-section embed,
+    .content-section iframe {
+      width: 100%;
+      flex: 1;
+      border: none;
+      display: block;
+      height: calc(100% - 44px);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 14px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+
+<body>
+<div class="shell">
+
+  <!-- HEADER -->
+  <header>
+    <h1>My Sample Work / Skills Demonstration</h1>
+    <a href="../index.html" id="detButton" title="Home">
+      <svg viewBox="0 0 576 512">
+        <path fill="#ffffff" d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/>
+      </svg>
+    </a>
+  </header>
+
+  <!-- MAIN SPLIT -->
+  <div class="content-container">
+
+    <!-- SIDEBAR WRAPPER -->
+    <div class="sidebar-wrapper">
+
+      <!-- FIXED LABEL — stays at top always -->
+      <div class="sidebar-label">Click on the tabs to learn more</div>
+
+      <!-- SCROLLABLE BUTTONS — scroll independently below label -->
+      <div class="button-section">
+
+        <button class="fancy-button" onclick="loadContent('work samples/Instructional Design/index.html', 'Instructional Design', this)">
+          <span class="station-code">Instructional Design</span>
+          <span class="description">Course designed from Script to visual storyboarding and interactive development</span>
+        </button>        
+
+        <button class="fancy-button" onclick="loadContent('work samples/adapt authoring.html', 'Adapt Authoring', this)">
+          <span class="station-code">Adapt Authoring</span>
+          <span class="description">Course designed for adapt authoring and content development</span>
+        </button>   
+
+        <button class="fancy-button" onclick="loadContent('work samples/branching scenarios.html', 'Branching Scenarios', this)">
+          <span class="station-code">Branching Scenarios</span>
+          <span class="description">Course designed for branching scenarios and decision-making exercises</span>
+        </button>
+
+        <button class="fancy-button" onclick="loadContent('work samples/simulations.html', 'Simulations', this)">
+          <span class="station-code">Simulations</span>
+          <span class="description">Course designed for simulation-based learning and training</span>
+        </button>             
+
+        <button class="fancy-button" onclick="loadContent('work samples/Deloitte Game/story.html', 'Gamification', this)">
+          <span class="station-code">Gamification</span>
+          <span class="description">Course designed, developed for gamified learning and engagement</span>
+        </button>
+
+        <button class="fancy-button" onclick="loadContent('work samples/assessment design.html', 'Assessment Design', this)">
+          <span class="station-code">Assessment Design</span>
+          <span class="description">Knowledge Check and Course designed for assessment design and evaluation</span>
+        </button>        
+
+        <button class="fancy-button" onclick="loadContent('work samples/custom development.html', 'Custom Development', this)">
+          <span class="station-code">Custom Development</span>
+          <span class="description">List of custom developed features for SCORM Courses</span>
+        </button>
+        
+      </div>
+    </div>
+
+    <!-- CONTENT PANEL -->
+    <div class="content-section" id="contentSection">
+      <div class="content-topbar">
+        <span class="content-topbar-label">Viewing —</span>
+        <span class="content-topbar-title" id="contentTitle">Navigation</span>
+      </div>
+      <div class="loader-container" id="loaderContainer" style="display:none;">
+        <div class="loader"></div>
+      </div>
+      <embed src="Front_Page.html" type="text/html" width="100%" height="100%" id="contentEmbed">
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 — Rakesh Dama — Portfolio</p>
+  </footer>
+
+</div>
+
+<script>
+  let activeBtn = null;
+
+  function loadContent(page, title, btn) {
+    if (activeBtn) activeBtn.classList.remove('active');
+    activeBtn = btn;
+    btn.classList.add('active');
+
+    document.getElementById('contentTitle').textContent = title || page;
+
+    const section = document.getElementById('contentSection');
+    const loader  = document.getElementById('loaderContainer');
+    loader.style.display = 'flex';
+
+    const existing = section.querySelector('embed');
+    if (existing) existing.remove();
+
+    const embed = document.createElement('embed');
+    embed.src    = page;
+    embed.type   = 'text/html';
+    embed.style.width  = '100%';
+    embed.style.height = 'calc(100% - 44px)';
+    embed.style.border = 'none';
+    embed.id     = 'contentEmbed';
+    embed.onload = () => { loader.style.display = 'none'; };
+    section.appendChild(embed);
+
+    setTimeout(() => { loader.style.display = 'none'; }, 3000);
+  }
+</script>
+
+</body>
+</html>
